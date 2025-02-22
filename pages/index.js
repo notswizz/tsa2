@@ -8,7 +8,7 @@ import {
   Bot, MessageSquare
 } from 'lucide-react';
 import Image from 'next/image';
-import ChatModal from '@/components/common/ChatModal';
+import ChatModal from '@/features/ai-assistant/components/ChatModal';
 
 export default function Home() {
   const [stats, setStats] = useState({

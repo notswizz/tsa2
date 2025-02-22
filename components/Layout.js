@@ -10,7 +10,7 @@ import {
   Home
 } from 'lucide-react';
 import ChatBubble from './common/ChatBubble';
-import ChatModal from './common/ChatModal';
+import ChatModal from '@/features/ai-assistant/components/ChatModal';
 import Image from 'next/image';
 
 export default function Layout({ children }) {

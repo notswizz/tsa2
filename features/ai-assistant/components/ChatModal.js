@@ -38,7 +38,6 @@ export default function ChatModal({ isOpen, onClose }) {
     scrollToBottom();
   }, [messages]);
 
-  // Focus input when modal opens
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
@@ -51,23 +50,19 @@ export default function ChatModal({ isOpen, onClose }) {
     e.preventDefault();
     if (!input.trim()) return;
 
-    // Add user message
     const userMessage = { type: 'user', content: input };
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
 
     try {
-      // Convert messages to OpenAI format
       const aiMessages = messages.map(msg => ({
         role: msg.type === 'user' ? 'user' : 'assistant',
         content: msg.content
       }));
 
-      // Add the new user message
       aiMessages.push({ role: 'user', content: input });
 
-      // Call AI endpoint
       const response = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: {
@@ -82,7 +77,6 @@ export default function ChatModal({ isOpen, onClose }) {
 
       const data = await response.json();
       
-      // Add AI response
       setMessages(prev => [...prev, { 
         type: 'bot', 
         content: data.content 
@@ -96,15 +90,6 @@ export default function ChatModal({ isOpen, onClose }) {
       }]);
     } finally {
       setIsTyping(false);
-    }
-  };
-
-  const isImageUrl = (text) => {
-    try {
-      const url = new URL(text);
-      return url.pathname.match(/\.(jpg|jpeg|png|gif|webp)$/i);
-    } catch {
-      return false;
     }
   };
 
