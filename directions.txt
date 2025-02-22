@@ -1,0 +1,134 @@
+The Smith Agency CRM - Application Structure
+
+1. ROOT STRUCTURE
+/
+├── components/     # React components organized by feature
+├── pages/         # Next.js pages and API routes
+├── public/        # Static assets
+├── styles/        # Global CSS and Tailwind styles
+├── models/        # Mongoose models
+├── utils/         # Utility functions and helpers
+├── .env.local     # Environment variables
+└── tailwind.config.js  # Tailwind configuration
+
+2. CORE STYLING
+/styles/globals.css
+- Tailwind imports
+- Custom component classes
+- Custom scrollbar styling
+- Form input styling classes
+- Button styling classes
+
+/tailwind.config.js
+- Custom colors including 'tsa-pink' (#FF69B4)
+- Dark theme colors
+- Custom background gradients
+- Extended spacing and sizing
+
+3. COMPONENT STRUCTURE
+/components/
+├── Layout.js      # Main layout wrapper with navigation
+├── Bookings/      # Booking-related components
+│   ├── BookingForm.js    # Create/edit booking form
+│   ├── BookingList.js    # List of booking cards
+│   ├── BookingCard.js    # Individual booking display
+│   └── BookingModal.js   # Edit booking modal
+├── Staff/         # Staff-related components
+│   ├── StaffForm.js      # Create/edit staff form
+│   ├── StaffList.js      # List of staff cards
+│   ├── StaffCard.js      # Individual staff display
+│   └── StaffModal.js     # Edit staff modal
+└── Clients/       # Client-related components
+    ├── ClientForm.js     # Create/edit client form
+    ├── ClientList.js     # List of client cards
+    ├── ClientCard.js     # Individual client display
+    └── ClientModal.js    # Edit client modal
+
+4. PAGE STRUCTURE
+/pages/
+├── _app.js        # Next.js app wrapper
+├── index.js       # Dashboard/home page
+├── bookings/      # Booking pages
+│   └── index.js   # Main bookings page
+├── staff/         # Staff pages
+│   └── index.js   # Main staff page
+├── clients/       # Client pages
+│   └── index.js   # Main clients page
+└── api/          # API routes
+    ├── bookings/  # Booking endpoints
+    │   ├── index.js      # GET/POST bookings
+    │   └── [id].js       # GET/PUT/DELETE specific booking
+    ├── staff/     # Staff endpoints
+    │   ├── index.js      # GET/POST staff
+    │   └── [id].js       # GET/PUT/DELETE specific staff
+    └── clients/   # Client endpoints
+        ├── index.js      # GET/POST clients
+        └── [id].js       # GET/PUT/DELETE specific client
+
+5. DATABASE MODELS
+/models/
+├── Booking.js     # Booking schema and model
+├── Staff.js       # Staff schema and model
+└── Client.js      # Client schema and model
+
+6. UTILITIES
+/utils/
+└── db.js         # MongoDB/Mongoose connection utility
+
+7. KEY FEATURES
+- Sticky filters and stats with scrollable content areas
+- Consistent form styling using Tailwind classes
+- Modal-based edit forms
+- Responsive layout with mobile navigation
+- Dark theme with cyber-inspired design
+- Real-time filtering and search
+- Date-based booking management
+- Staff assignment and tracking
+- Client relationship management
+
+8. THEME CONFIGURATION
+Colors:
+- Primary: tsa-pink (#FF69B4)
+- Background: dark-slate (#111111)
+- Secondary Background: darker-slate (#0A0A0A)
+- Form Background: light-slate (#1A1A1A)
+
+Components:
+- cyber-box: Main container style
+- cyber-button: Primary action buttons
+- secondary-button: Secondary actions
+- form-input: Form input fields
+- form-select: Form select fields
+- form-textarea: Form textarea fields
+
+9. RESPONSIVE DESIGN
+- Mobile-first approach
+- Breakpoints:
+  - sm: 640px
+  - md: 768px
+  - lg: 1024px
+  - xl: 1280px
+- Collapsible navigation on mobile
+- Responsive grid layouts for cards
+- Adaptive form layouts
+
+10. STATE MANAGEMENT
+- React useState for component state
+- React useEffect for data fetching
+- Prop drilling for component communication
+- Form state managed per feature
+- Filter state for list views
+- Modal state for edit forms
+
+11. API STRUCTURE
+All API routes follow RESTful conventions:
+- GET /api/[resource] - List all
+- POST /api/[resource] - Create new
+- GET /api/[resource]/[id] - Get one
+- PUT /api/[resource]/[id] - Update one
+- DELETE /api/[resource]/[id] - Delete one
+
+12. ENVIRONMENT VARIABLES
+Required in .env.local:
+- MONGODB_URI: MongoDB connection string
+- NEXT_PUBLIC_API_URL: API base URL 
