@@ -80,10 +80,38 @@ export default function Bookings() {
 
   const fetchBookings = async () => {
     try {
-      const res = await fetch('/api/bookings');
+      const res = await fetch('/api/bookings?populate=true');
       if (!res.ok) throw new Error('Failed to fetch bookings');
       const data = await res.json();
-      setBookings(data);
+      
+      // Transform the dates from ISOString to Date objects
+      const transformedBookings = data.map(booking => ({
+        ...booking,
+        _id: booking._id.$oid || booking._id,
+        startDate: new Date(booking.startDate.$date || booking.startDate),
+        endDate: new Date(booking.endDate.$date || booking.endDate),
+        show: {
+          ...(booking.show || {}),
+          _id: booking.show?.$oid || booking.show?._id || booking.show
+        },
+        client: {
+          ...(booking.client || {}),
+          _id: booking.client?.$oid || booking.client?._id || booking.client
+        },
+        dailyStaffing: (booking.dailyStaffing || []).map(day => ({
+          ...day,
+          _id: day._id.$oid || day._id,
+          date: new Date(day.date.$date || day.date),
+          staffNeeded: parseInt(day.staffNeeded.$numberInt || day.staffNeeded),
+          assignedStaff: (day.assignedStaff || []).map(staff => ({
+            ...(typeof staff === 'object' ? staff : {}),
+            _id: staff._id?.$oid || staff?._id || staff,
+            name: staff.name || 'Unnamed Staff'
+          }))
+        }))
+      }));
+
+      setBookings(transformedBookings);
     } catch (err) {
       console.error('Error fetching bookings:', err);
     }
@@ -122,9 +150,87 @@ export default function Bookings() {
     }
   };
 
-  const handleEdit = (booking) => {
-    setEditingBooking(booking);
-    setIsModalOpen(true);
+  const handleStatusUpdate = async (bookingId, newStatus) => {
+    try {
+      const booking = bookings.find(b => b._id === bookingId);
+      if (!booking) return;
+
+      const updatedBooking = { ...booking, status: newStatus };
+      const res = await fetch(`/api/bookings/${bookingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedBooking),
+      });
+
+      if (!res.ok) throw new Error('Failed to update booking status');
+      
+      const data = await res.json();
+      setBookings(prevBookings => 
+        prevBookings.map(b => b._id === bookingId ? data : b)
+      );
+    } catch (err) {
+      console.error('Error updating booking status:', err);
+    }
+  };
+
+  const handleEdit = async (booking) => {
+    try {
+      // Set the initial booking data and open modal immediately
+      setEditingBooking({
+        ...booking,
+        dailyStaffing: booking.dailyStaffing.map(day => ({
+          ...day,
+          assignedStaff: day.assignedStaff.map(staff => ({
+            ...(typeof staff === 'object' ? staff : {}),
+            _id: staff._id || staff,
+            name: staff.name || 'Unnamed Staff'
+          }))
+        }))
+      });
+      setIsModalOpen(true);
+      
+      // Then fetch the complete booking data
+      const res = await fetch(`/api/bookings/${booking._id}?populate=true`);
+      if (!res.ok) throw new Error('Failed to fetch booking details');
+      const data = await res.json();
+
+      // Transform the dates and IDs while preserving existing data
+      const completeBooking = {
+        ...data,
+        _id: data._id.$oid || data._id,
+        startDate: new Date(data.startDate.$date || data.startDate),
+        endDate: new Date(data.endDate.$date || data.endDate),
+        show: {
+          ...(data.show || {}),
+          _id: data.show?.$oid || data.show?._id || data.show
+        },
+        client: {
+          ...(data.client || {}),
+          _id: data.client?.$oid || data.client?._id || data.client
+        },
+        status: data.status,
+        notes: data.notes || '',
+        dailyStaffing: (data.dailyStaffing || []).map(day => ({
+          ...day,
+          _id: day._id.$oid || day._id,
+          date: new Date(day.date.$date || day.date),
+          staffNeeded: parseInt(day.staffNeeded.$numberInt || day.staffNeeded),
+          assignedStaff: (day.assignedStaff || []).map(staff => ({
+            ...(typeof staff === 'object' ? staff : {}),
+            _id: staff._id?.$oid || staff?._id || staff,
+            name: staff.name || 'Unnamed Staff'
+          }))
+        }))
+      };
+
+      // Only update if modal is still open
+      if (isModalOpen) {
+        setEditingBooking(completeBooking);
+      }
+    } catch (err) {
+      console.error('Error fetching booking details:', err);
+      // Don't close modal on error, just keep showing initial data
+    }
   };
 
   const handleDelete = async (bookingId) => {
@@ -189,7 +295,7 @@ export default function Bookings() {
 
       <div className="h-[calc(100vh-6rem)] flex flex-col">
         {/* Fixed Header Section */}
-        <div className="flex-none py-6">
+        <div className="flex-none py-6 space-y-4">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center justify-between">
@@ -231,6 +337,65 @@ export default function Bookings() {
               </div>
             </div>
           </div>
+
+          {/* Filters and Actions Row */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            {/* Show Type Filter */}
+            <div className="relative flex-1">
+              <select
+                value={showTypeFilter}
+                onChange={(e) => setShowTypeFilter(e.target.value)}
+                className="w-full appearance-none bg-dark-slate/50 border border-pink-200/20 rounded-lg px-4 py-2.5 text-white placeholder-gray-400 focus:border-pink-400 focus:outline-none"
+              >
+                <option value="all">All Show Types</option>
+                <option value="Gift">Gift Show</option>
+                <option value="Apparel">Apparel Show</option>
+                <option value="Bridal">Bridal Show</option>
+                <option value="Other">Other Shows</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+            </div>
+
+            {/* Season Filter */}
+            <div className="relative flex-1">
+              <select
+                value={seasonFilter}
+                onChange={(e) => setSeasonFilter(e.target.value)}
+                className="w-full appearance-none bg-dark-slate/50 border border-pink-200/20 rounded-lg px-4 py-2.5 text-white placeholder-gray-400 focus:border-pink-400 focus:outline-none"
+              >
+                <option value="all">All Seasons</option>
+                <option value="Spring">Spring</option>
+                <option value="Summer">Summer</option>
+                <option value="Fall">Fall</option>
+                <option value="Winter">Winter</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+            </div>
+
+            {/* Location Filter */}
+            <div className="relative flex-1">
+              <select
+                value={locationFilter}
+                onChange={(e) => setLocationFilter(e.target.value)}
+                className="w-full appearance-none bg-dark-slate/50 border border-pink-200/20 rounded-lg px-4 py-2.5 text-white placeholder-gray-400 focus:border-pink-400 focus:outline-none"
+              >
+                <option value="all">All Locations</option>
+                <option value="ATL">Atlanta</option>
+                <option value="NYC">New York</option>
+                <option value="LA">Los Angeles</option>
+                <option value="DAL">Dallas</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+            </div>
+
+            {/* Add Booking Button */}
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-pink-500/20 border border-pink-300/30 text-pink-100 rounded-lg hover:bg-pink-500/30 transition-all duration-200"
+            >
+              <span className="text-base">Add Booking</span>
+            </button>
+          </div>
         </div>
 
         {showForm ? (
@@ -266,6 +431,7 @@ export default function Bookings() {
                   formatDate={formatDate}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
+                  onStatusUpdate={handleStatusUpdate}
                   columnView
                 />
               </div>
@@ -286,6 +452,7 @@ export default function Bookings() {
                   formatDate={formatDate}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
+                  onStatusUpdate={handleStatusUpdate}
                   columnView
                 />
               </div>
@@ -306,6 +473,7 @@ export default function Bookings() {
                   formatDate={formatDate}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
+                  onStatusUpdate={handleStatusUpdate}
                   columnView
                 />
               </div>
@@ -318,6 +486,7 @@ export default function Bookings() {
                 formatDate={formatDate}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onStatusUpdate={handleStatusUpdate}
               />
             </div>
           </div>
@@ -325,7 +494,10 @@ export default function Bookings() {
 
         <BookingModal
           isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingBooking(null);
+          }}
           booking={editingBooking}
           onSave={handleSaveEdit}
           shows={shows}

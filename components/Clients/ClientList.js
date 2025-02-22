@@ -66,16 +66,16 @@ export default function ClientList() {
 
   if (loading) return (
     <div className="h-full flex items-center justify-center">
-      <div className="cyber-box p-6">
-        <p className="text-cyber-pink">Loading clients data...</p>
+      <div className="elegant-box p-6">
+        <p className="text-tsa-accent">Loading clients data...</p>
       </div>
     </div>
   );
 
   if (error) return (
     <div className="h-full flex items-center justify-center">
-      <div className="cyber-box p-6">
-        <p className="text-red-500">{error}</p>
+      <div className="elegant-box p-6">
+        <p className="text-rose-400">{error}</p>
       </div>
     </div>
   );
@@ -85,21 +85,21 @@ export default function ClientList() {
   return (
     <div className="h-full flex flex-col space-y-6">
       {/* Search Bar and Add Button */}
-      <div className="cyber-box p-4">
+      <div className="elegant-box p-4">
         <div className="flex items-center gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-tsa-light" />
             <input
               type="text"
               placeholder="Search by company, category, contacts..."
-              className="w-full bg-dark-slate/50 border border-cyber-pink/20 rounded-lg pl-10 pr-4 py-2 text-white focus:border-cyber-pink focus:outline-none"
+              className="w-full bg-tsa-black/50 border border-tsa-accent/20 rounded-lg pl-10 pr-4 py-2.5 text-tsa-white placeholder-tsa-light/50 focus:border-pink-300/30 focus:outline-none transition-colors"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <button
             onClick={handleAddClient}
-            className="px-4 py-2 bg-pink-500/20 border border-pink-300/30 text-pink-100 rounded-lg hover:bg-pink-500/30 transition-all duration-200 flex items-center gap-2"
+            className="px-4 py-2.5 bg-pink-500/10 border border-pink-300/20 text-pink-50 rounded-lg hover:bg-pink-500/20 hover:border-pink-300/30 transition-all duration-200 flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
             <span>Add Client</span>
@@ -112,7 +112,7 @@ export default function ClientList() {
         <div className="h-full overflow-y-auto pr-2">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredClients.length === 0 ? (
-              <div className="col-span-full cyber-box p-6 text-center text-gray-400">
+              <div className="col-span-full elegant-box p-6 text-center text-tsa-light">
                 No clients found matching your search.
               </div>
             ) : (
@@ -120,28 +120,28 @@ export default function ClientList() {
                 <div 
                   key={client._id}
                   onClick={() => handleEdit(client)}
-                  className="relative bg-black/30 backdrop-blur-xl rounded-xl border border-pink-200/20 hover:border-pink-300/30 transition-all duration-300 overflow-hidden group cursor-pointer"
+                  className="relative bg-tsa-dark/80 backdrop-blur-xl rounded-lg border border-tsa-accent/10 hover:border-pink-300/20 transition-all duration-300 overflow-hidden group cursor-pointer"
                 >
-                  {/* Enhanced Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 via-purple-500/10 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  {/* Subtle Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-elegant opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   
                   {/* Main Content */}
-                  <div className="relative p-4">
+                  <div className="relative p-6">
                     {/* Header Section */}
-                    <div className="flex justify-between items-start mb-4">
+                    <div className="flex justify-between items-start mb-6">
                       <div>
-                        <h3 className="text-2xl font-light text-white tracking-wide group-hover:text-pink-200 transition-colors">
+                        <h3 className="text-2xl font-display text-tsa-white group-hover:text-pink-50 transition-colors">
                           {client.companyName}
                         </h3>
                         <div className="flex items-center gap-2 mt-2">
-                          <Building className="h-4 w-4 text-gray-400" />
-                          <span className="text-gray-400">{client.category}</span>
+                          <Building className="h-4 w-4 text-tsa-accent" />
+                          <span className="text-tsa-light font-light">{client.category}</span>
                         </div>
                       </div>
                       {client.boothLocation && (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/30 backdrop-blur-md border border-cyan-300/30 shadow-lg shadow-cyan-500/10">
-                          <MapPin className="h-4 w-4 text-cyan-300" />
-                          <span className="text-sm font-medium text-cyan-100">Booth {client.boothLocation}</span>
+                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-pink-500/10 backdrop-blur-sm border border-pink-300/20">
+                          <MapPin className="h-4 w-4 text-pink-300" />
+                          <span className="text-sm font-light text-pink-50">Booth {client.boothLocation}</span>
                         </div>
                       )}
                     </div>
@@ -153,13 +153,13 @@ export default function ClientList() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-500/10 border border-violet-300/20 hover:bg-violet-500/20 transition-colors duration-200 mb-4 group/link"
+                        className="flex items-center gap-3 px-4 py-3 mb-4 rounded-lg bg-tsa-black/50 border border-tsa-accent/10 hover:border-pink-300/20 transition-all duration-200 group/link"
                       >
-                        <Globe className="h-4 w-4 text-violet-300 group-hover/link:scale-110 transition-transform" />
-                        <span className="text-sm text-violet-200 truncate flex-1">
+                        <Globe className="h-4 w-4 text-tsa-accent group-hover/link:text-pink-300 transition-colors" />
+                        <span className="text-sm text-tsa-white font-light truncate flex-1">
                           {client.website.replace(/^https?:\/\//, '')}
                         </span>
-                        <ExternalLink className="h-3 w-3 text-violet-300 group-hover/link:scale-110 transition-transform" />
+                        <ExternalLink className="h-3.5 w-3.5 text-tsa-accent group-hover/link:text-pink-300 transition-colors" />
                       </a>
                     )}
 
@@ -171,28 +171,28 @@ export default function ClientList() {
                             {client.contacts.map((contact, index) => (
                               <div 
                                 key={index}
-                                className="p-3 bg-dark-slate/30 rounded-lg border border-pink-300/10 hover:border-pink-300/20 transition-all duration-200"
+                                className="p-4 bg-tsa-black/50 rounded-lg border border-tsa-accent/10 hover:border-pink-300/20 transition-all duration-200"
                               >
-                                <p className="text-white mb-2">{contact.name}</p>
+                                <p className="text-tsa-white font-light mb-3">{contact.name}</p>
                                 <div className="grid grid-cols-2 gap-2">
                                   {contact.email && (
                                     <a
                                       href={`mailto:${contact.email}`}
                                       onClick={(e) => e.stopPropagation()}
-                                      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-teal-500/10 border border-teal-300/20 hover:bg-teal-500/20 transition-colors duration-200 group/link"
+                                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-tsa-black/30 border border-tsa-accent/10 hover:border-pink-300/20 transition-all duration-200 group/link"
                                     >
-                                      <Mail className="h-3.5 w-3.5 text-teal-300 group-hover/link:scale-110 transition-transform" />
-                                      <span className="text-sm text-teal-200 truncate">{contact.email}</span>
+                                      <Mail className="h-3.5 w-3.5 text-tsa-accent group-hover/link:text-pink-300 transition-colors" />
+                                      <span className="text-sm text-tsa-white font-light truncate">{contact.email}</span>
                                     </a>
                                   )}
                                   {contact.phone && (
                                     <a
                                       href={`tel:${contact.phone}`}
                                       onClick={(e) => e.stopPropagation()}
-                                      className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-300/20 hover:bg-indigo-500/20 transition-colors duration-200 group/link"
+                                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-tsa-black/30 border border-tsa-accent/10 hover:border-pink-300/20 transition-all duration-200 group/link"
                                     >
-                                      <Phone className="h-3.5 w-3.5 text-indigo-300 group-hover/link:scale-110 transition-transform" />
-                                      <span className="text-sm text-indigo-200 truncate">{contact.phone}</span>
+                                      <Phone className="h-3.5 w-3.5 text-tsa-accent group-hover/link:text-pink-300 transition-colors" />
+                                      <span className="text-sm text-tsa-white font-light truncate">{contact.phone}</span>
                                     </a>
                                   )}
                                 </div>
@@ -201,14 +201,14 @@ export default function ClientList() {
                           </div>
                         </div>
                         {/* Fade effect at the bottom */}
-                        <div className="absolute bottom-0 left-0 right-2 h-6 bg-gradient-to-t from-black/30 to-transparent pointer-events-none"></div>
+                        <div className="absolute bottom-0 left-0 right-2 h-8 bg-gradient-to-t from-tsa-dark via-tsa-dark/50 to-transparent pointer-events-none"></div>
                       </div>
                     )}
 
                     {/* Notes Section */}
                     {client.notes && (
-                      <div className="p-3 bg-dark-slate/20 rounded-lg border border-pink-300/10">
-                        <p className="text-sm text-gray-400 line-clamp-2">{client.notes}</p>
+                      <div className="p-4 bg-tsa-black/50 rounded-lg border border-tsa-accent/10">
+                        <p className="text-sm text-tsa-light font-light line-clamp-2">{client.notes}</p>
                       </div>
                     )}
                   </div>
@@ -220,33 +220,33 @@ export default function ClientList() {
       </div>
 
       {/* Stats Summary - Hidden on mobile */}
-      <div className="hidden md:block cyber-box p-3">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+      <div className="hidden md:block elegant-box p-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div>
-            <p className="text-gray-400 text-sm">Total Clients</p>
-            <p className="text-xl font-bold text-white">
-              {filteredClients.length} <span className="text-sm text-gray-400">/ {clients.length}</span>
+            <p className="text-tsa-light font-light mb-2">Total Clients</p>
+            <p className="text-2xl font-display text-tsa-white">
+              {filteredClients.length} <span className="text-sm text-pink-300">/ {clients.length}</span>
             </p>
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Total Contacts</p>
-            <p className="text-xl font-bold text-cyber-pink">
+            <p className="text-tsa-light font-light mb-2">Total Contacts</p>
+            <p className="text-2xl font-display text-tsa-white">
               {filteredClients.reduce((sum, client) => sum + (client.contacts?.length || 0), 0)}
-              <span className="text-sm text-gray-400"> / {clients.reduce((sum, client) => sum + (client.contacts?.length || 0), 0)}</span>
+              <span className="text-sm text-pink-300"> / {clients.reduce((sum, client) => sum + (client.contacts?.length || 0), 0)}</span>
             </p>
           </div>
           <div>
-            <p className="text-gray-400 text-sm">With Booths</p>
-            <p className="text-xl font-bold text-neon-blue">
+            <p className="text-tsa-light font-light mb-2">With Booths</p>
+            <p className="text-2xl font-display text-tsa-white">
               {filteredClients.filter(c => c.boothLocation).length}
-              <span className="text-sm text-gray-400"> / {clients.filter(c => c.boothLocation).length}</span>
+              <span className="text-sm text-pink-300"> / {clients.filter(c => c.boothLocation).length}</span>
             </p>
           </div>
           <div>
-            <p className="text-gray-400 text-sm">Categories</p>
-            <p className="text-xl font-bold text-emerald-400">
+            <p className="text-tsa-light font-light mb-2">Categories</p>
+            <p className="text-2xl font-display text-tsa-white">
               {[...new Set(filteredClients.map(client => client.category))].length}
-              <span className="text-sm text-gray-400"> / {uniqueCategories.length}</span>
+              <span className="text-sm text-pink-300"> / {uniqueCategories.length}</span>
             </p>
           </div>
         </div>

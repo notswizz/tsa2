@@ -1,10 +1,29 @@
 import { useState, useRef, useEffect } from 'react';
 import { Dialog } from '@headlessui/react';
-import { Bot, X, Send, Loader2 } from 'lucide-react';
+import { Bot, X, Send, Loader2, Image as ImageIcon } from 'lucide-react';
+
+const extractImagesFromMarkdown = (text) => {
+  const imageRegex = /!\[.*?\]\((.*?)\)/g;
+  const images = [];
+  let match;
+  
+  while ((match = imageRegex.exec(text)) !== null) {
+    images.push(match[1]);
+  }
+  
+  return images;
+};
+
+const formatMessageContent = (content) => {
+  // Replace Markdown image syntax with a placeholder
+  const textContent = content.replace(/!\[.*?\]\((.*?)\)/g, '');
+  // Clean up any double spaces or empty lines created by image removal
+  return textContent.replace(/\s+/g, ' ').trim();
+};
 
 export default function ChatModal({ isOpen, onClose }) {
   const [messages, setMessages] = useState([
-    { type: 'bot', content: 'Hello! I\'m your AI assistant. How can I help you today?' }
+    { type: 'bot', content: 'Hello! I\'m your AI assistant. How can I help you with The Smith Agency CRM today?' }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -38,12 +57,55 @@ export default function ChatModal({ isOpen, onClose }) {
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
-      const botMessage = { type: 'bot', content: 'This is a simulated response. Replace with actual AI integration.' };
-      setMessages(prev => [...prev, botMessage]);
+    try {
+      // Convert messages to OpenAI format
+      const aiMessages = messages.map(msg => ({
+        role: msg.type === 'user' ? 'user' : 'assistant',
+        content: msg.content
+      }));
+
+      // Add the new user message
+      aiMessages.push({ role: 'user', content: input });
+
+      // Call AI endpoint
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: aiMessages }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const data = await response.json();
+      
+      // Add AI response
+      setMessages(prev => [...prev, { 
+        type: 'bot', 
+        content: data.content 
+      }]);
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prev => [...prev, { 
+        type: 'bot', 
+        content: 'Sorry, I encountered an error. Please try again.',
+        error: true
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1000);
+    }
+  };
+
+  const isImageUrl = (text) => {
+    try {
+      const url = new URL(text);
+      return url.pathname.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+    } catch {
+      return false;
+    }
   };
 
   return (
@@ -75,22 +137,54 @@ export default function ChatModal({ isOpen, onClose }) {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+            {messages.map((message, index) => {
+              const images = extractImagesFromMarkdown(message.content);
+              const textContent = formatMessageContent(message.content);
+              
+              return (
                 <div
-                  className={`max-w-[85%] sm:max-w-[75%] p-3 rounded-2xl ${
-                    message.type === 'user'
-                      ? 'bg-pink-500/20 text-white ml-4'
-                      : 'bg-dark-slate text-white mr-4'
-                  }`}
+                  key={index}
+                  className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  {message.content}
+                  <div
+                    className={`max-w-[85%] sm:max-w-[75%] p-3 rounded-2xl ${
+                      message.type === 'user'
+                        ? 'bg-pink-500/20 text-white ml-4'
+                        : message.error
+                        ? 'bg-red-500/20 text-red-100'
+                        : 'bg-dark-slate text-white mr-4'
+                    }`}
+                  >
+                    {/* Text content */}
+                    {textContent && <div className="mb-3">{textContent}</div>}
+                    
+                    {/* Images */}
+                    {images.length > 0 && (
+                      <div className="space-y-2">
+                        {images.map((imageUrl, imgIndex) => (
+                          <div key={imgIndex} className="space-y-1">
+                            <div className="flex items-center gap-2 text-sm text-gray-400">
+                              <ImageIcon className="w-3 h-3" />
+                              Photo
+                            </div>
+                            <img 
+                              src={imageUrl} 
+                              alt="Content"
+                              className="rounded-lg max-w-full h-auto object-cover"
+                              style={{ maxHeight: '200px', width: 'auto' }}
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpolyline points='21 15 16 10 5 21'/%3E%3C/svg%3E";
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {isTyping && (
               <div className="flex justify-start">
                 <div className="bg-dark-slate text-white p-3 rounded-2xl flex items-center gap-2">
@@ -116,7 +210,7 @@ export default function ChatModal({ isOpen, onClose }) {
               <button
                 type="submit"
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-2 text-pink-400 hover:text-pink-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!input.trim()}
+                disabled={!input.trim() || isTyping}
               >
                 <Send className="w-5 h-5" />
               </button>

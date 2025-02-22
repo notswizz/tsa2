@@ -8,20 +8,23 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'tsa-pink': '#FF69B4',
-        'dark-slate': '#111111',
-        'darker-slate': '#0A0A0A',
-        'light-slate': '#1A1A1A',
-        'cyber-blue': '#0A1128',
-        'neon-blue': '#00F6FF',
-        'slate-850': '#1E293B',
+        'tsa-black': '#000000',
+        'tsa-dark': '#111111',
+        'tsa-gray': '#333333',
+        'tsa-light': '#666666',
+        'tsa-white': '#FFFFFF',
+        'tsa-accent': '#CCCCCC',
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+        display: ['Playfair Display', 'serif'],
       },
       boxShadow: {
-        'neon': '0 0 5px theme(colors.neon-pink), 0 0 20px theme(colors.neon-pink.500)',
-        'cyber': '0 0 10px rgba(255, 0, 128, 0.3)',
+        'elegant': '0 4px 6px rgba(0, 0, 0, 0.1)',
+        'hover': '0 10px 15px rgba(0, 0, 0, 0.2)',
       },
       backgroundImage: {
-        'cyber-gradient': 'linear-gradient(to bottom, #0A0A0A, #111111)',
+        'gradient-elegant': 'linear-gradient(to bottom, #000000, #111111)',
       }
     },
   },

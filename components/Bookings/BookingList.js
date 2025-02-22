@@ -5,8 +5,9 @@ import BookingFilters from './BookingFilters';
 export default function BookingList({ 
   bookings, 
   formatDate, 
-  onEdit, 
+  onEdit,
   onDelete,
+  onStatusUpdate,
   columnView = false 
 }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,8 +16,8 @@ export default function BookingList({
   const [showTypeFilter, setShowTypeFilter] = useState('all');
 
   // Extract unique locations and show types from bookings
-  const locations = [...new Set(bookings.map(booking => booking.show.location))];
-  const showTypes = [...new Set(bookings.map(booking => booking.show.type))];
+  const locations = [...new Set(bookings.map(booking => booking.show?.location).filter(Boolean))];
+  const showTypes = [...new Set(bookings.map(booking => booking.show?.type).filter(Boolean))];
 
   // Filter bookings
   const filteredBookings = bookings.filter(booking => {
@@ -66,6 +67,7 @@ export default function BookingList({
             formatDate={formatDate}
             onEdit={onEdit}
             onDelete={onDelete}
+            onStatusUpdate={onStatusUpdate}
             columnView={columnView}
           />
         </div>
